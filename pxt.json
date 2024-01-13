@@ -1,0 +1,25 @@
+{
+    "name": "Calliope_Uhr_V2",
+    "description": "",
+    "dependencies": {
+        "core": "*",
+        "v3": "*",
+        "Grove": "github:calliope-edu/pxt-grove#v0.2.7"
+    },
+    "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "targetVersions": {
+        "target": "6.0.27",
+        "targetId": "calliopemini"
+    },
+    "supportedTargets": [
+        "calliopemini"
+    ],
+    "preferredEditor": "blocksprj"
+}
