@@ -1,5 +1,4 @@
 function zeige_uhrzeit () {
-    _4Digit.clear()
     anzeige = stunden * 100 + minuten
     zeige_wert(anzeige)
 }
@@ -15,25 +14,57 @@ input.onPinTouchEvent(TouchPin.P1, input.buttonEventDown(), function () {
     }
 })
 function zeige_restzeit () {
-    _4Digit.clear()
     anzeige = restzeit_timer % 60
     anzeige += Math.floor(restzeit_timer / 60) * 100
     zeige_wert(anzeige)
 }
+// Nur die geänderten Ziffern werden aktualisiert.
 function zeige_wert (wert: number) {
-    _4Digit.show(wert)
-    if (wert < 10) {
-        _4Digit.bit(0, 2)
+    ziffer = wert % 10
+    if (ziffer != ziffern_alt[3]) {
+        _4Digit.bit(ziffer, 3)
+        ziffern_alt[3] = ziffer
     }
-    if (wert < 100) {
-        _4Digit.bit(0, 1)
+    ziffer = Math.floor(wert / 10) % 10
+    if (ziffer != ziffern_alt[2]) {
+        _4Digit.bit(ziffer, 2)
+        ziffern_alt[2] = ziffer
     }
-    if (wert < 1000) {
-        _4Digit.bit(0, 0)
+    ziffer = Math.floor(wert / 100) % 10
+    if (ziffer != ziffern_alt[1]) {
+        _4Digit.bit(ziffer, 1)
+        ziffern_alt[1] = ziffer
+    }
+    ziffer = Math.floor(wert / 1000) % 10
+    if (ziffer != ziffern_alt[0]) {
+        _4Digit.bit(ziffer, 0)
+        ziffern_alt[0] = ziffer
     }
 }
+input.onButtonEvent(Button.A, input.buttonEventClick(), function () {
+    if (!(timer_wird_gestellt)) {
+        if (uhr_wird_gestellt) {
+            uhr_wird_gestellt = false
+            basic.showLeds(`
+                . . . . .
+                . . . . .
+                . . . . .
+                . . . . .
+                . . . . .
+                `)
+        } else {
+            uhr_wird_gestellt = true
+            basic.showLeds(`
+                . # # # .
+                # . # . #
+                # . # # #
+                # . . . #
+                . # # # .
+                `)
+        }
+    }
+})
 function zeige_timer () {
-    _4Digit.clear()
     anzeige = laufzeit_timer % 60
     anzeige += Math.floor(laufzeit_timer / 60) * 100
     zeige_wert(anzeige)
@@ -88,9 +119,6 @@ input.onPinTouchEvent(TouchPin.P0, input.buttonEventDown(), function () {
         laufzeit_timer += 1
     }
 })
-function aktualisiere_timer () {
-	
-}
 function aktualisiere_uhrzeit () {
     millisekunden = input.runningTime()
     sekunden = Math.floor(millisekunden / 1000) + startzeit_uhr
@@ -99,32 +127,11 @@ function aktualisiere_uhrzeit () {
     minuten = minuten % 60
     stunden = stunden % 24
 }
-input.onButtonEvent(Button.A, input.buttonEventClick(), function () {
-    if (!(timer_wird_gestellt)) {
-        if (uhr_wird_gestellt) {
-            uhr_wird_gestellt = false
-            basic.showLeds(`
-                . . . . .
-                . . . . .
-                . . . . .
-                . . . . .
-                . . . . .
-                `)
-        } else {
-            uhr_wird_gestellt = true
-            basic.showLeds(`
-                . # # # .
-                # . # . #
-                # . # # #
-                # . . . #
-                . # # # .
-                `)
-        }
-    }
-})
 let startzeit_timer = 0
+let ziffer = 0
 let restzeit_timer = 0
 let _4Digit: grove.TM1637 = null
+let ziffern_alt: number[] = []
 let timer_laeuft = false
 let timer_wird_gestellt = false
 let uhr_wird_gestellt = false
@@ -145,6 +152,12 @@ laufzeit_timer = 0
 uhr_wird_gestellt = false
 timer_wird_gestellt = false
 timer_laeuft = false
+ziffern_alt = [
+10,
+10,
+10,
+10
+]
 _4Digit = grove.createDisplay(DigitalPin.C16, DigitalPin.C17)
 _4Digit.point(true)
 basic.forever(function () {
